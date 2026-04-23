@@ -21,7 +21,7 @@ A machine learning pipeline and interactive web dashboard for predicting the gla
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/yourusername/PolyBayes.git](https://github.com/yourusername/PolyBayes.git)
+   git clone [https://github.com/j-udge/PolyBayes.git](https://github.com/j-udge/PolyBayes.git)
    cd PolyBayes
    ```
 
@@ -38,17 +38,24 @@ A machine learning pipeline and interactive web dashboard for predicting the gla
    pip install -r requirements.txt
    ```
 
-## 🧠 Usage
+## Usage
 
-### 1. Training the Model (`model_form.py`)
-Ensure your processed parquet file (`processed_morgan_fp.parquet`) is in the `src` directory. The training script will partition the data, train the GPyTorch ExactGP model, calculate R² and RMSE, and freeze the weights into a `.pth` file.
+### 1. Preprocessing Data (`preprocess.py`)
+Before training, raw polymer data (Excel/CSV) must be converted into Morgan Fingerprints. This script handles NaN removal, SMILES validation via RDKit, and bit-vector generation. It outputs a high-performance `.parquet` file.
+
+```bash
+python src/preprocess.py
+```
+
+### 2. Training the Model (`model_form.py`)
+The training script loads the fingerprints, pushes the tensors to the **GPU (CUDA)**, and trains a GPyTorch ExactGP model. It calculates evaluation metrics ($R^2$, $RMSE$) and saves the model state and training data into a deployment-ready `.pth` file.
 
 ```bash
 python src/model_form.py
 ```
 
-### 2. Running the Dashboard (`app.py`)
-To launch the interactive web interface, use Streamlit. The app will load the frozen PyTorch model (running inference on the CPU for web stability) and open a local server.
+### 3. Running the Dashboard (`app.py`)
+To launch the interactive web interface, use Streamlit. The app loads the trained model and provides a real-time interface for polymer property prediction and uncertainty visualization.
 
 ```bash
 python -m streamlit run src/app.py
